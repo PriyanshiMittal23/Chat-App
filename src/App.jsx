@@ -8,10 +8,7 @@ import Home from './Pages/Home'
 const App = () => {
   return (
     <div>
-      {/* {JSON.stringify(storage)}; */}
-      {/* <Register /> */}
-      {/* <Login /> */}
-      <Home />
+      <Register/>
     </div>   
   )
 }
