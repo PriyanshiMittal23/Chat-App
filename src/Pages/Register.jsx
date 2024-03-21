@@ -1,25 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 import AddAvatar from "../images/addAvatar.png"
 import {auth} from '../firebase'
 import {createUserWithEmailAndPassword } from "firebase/auth";
 
 function Register() {
 
-  const handleSubmit = (e)=>{
+  const [err,setErr] = useState(false);
+
+  const handleSubmit = async(e)=>{
     e.preventDefault();
     const displayName = e.target[0].value;
     const email = e.target[1].value;
     const password = e.target[2].value;
     const file = e.target[3].files[0];
 
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-    });
+    try{
+      const user = await createUserWithEmailAndPassword(auth, email, password);
+    }
+    catch(err){
+      setErr(true);
+    }
 
   }
 
