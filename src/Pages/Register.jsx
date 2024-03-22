@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import AddAvatar from "../images/addAvatar.png"
-import {auth, storage} from '../firebase'
+import {auth, storage, db} from '../firebase'
 import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import {ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore"; 
 
 function Register() {
 
@@ -29,10 +30,18 @@ function Register() {
           await updateProfile(appUser.user,{
             displayName,
             photoURL:downloadURL
-          })
+          });
+          await setDoc(doc(db,"users",appUser.user.uid),{
+            uid:appUser.user.uid,
+            displayName,
+            email,
+            photoURL:downloadURL
+          });
+          // await setDoc(doc(db, "userChats",appUser.user.uid),{});
         });
       }
     );
+
     }
     catch(err){
       setErr(true);
@@ -54,8 +63,9 @@ function Register() {
                     <img src={AddAvatar} alt="" />
                     <span>Add an Avatar</span>
                 </label>
-                <button>Sign up</button>
+                <button type='submit'>Sign up</button>
             </form>
+            <span></span>
             <p>Already have an account? Login</p>
         </div>
 
