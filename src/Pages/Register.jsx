@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import AddAvatar from "../images/addAvatar.png"
 import {auth, storage, db} from '../firebase'
 import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import {ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {ref,uploadBytesResumable,getDownloadURL,uploadBytes,} from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore"; 
 
 function Register() {
@@ -20,30 +20,27 @@ function Register() {
       const appUser = await createUserWithEmailAndPassword(auth, email, password);
 
       const storageRef = ref(storage, displayName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on( 
-      (error) => {
-        setErr(true);
-      }, 
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then(async(downloadURL) => {
-          await updateProfile(appUser.user,{
+      uploadBytes(storageRef, file)
+        .then((snapshot) => {
+          return getDownloadURL(snapshot.ref);
+        })
+        .then(async (downloadURL) => {
+          console.log("Download URL", downloadURL);
+          await updateProfile(appUser.user, {
             displayName,
-            photoURL:downloadURL
+            photoURL: downloadURL,
           });
-          await setDoc(doc(db,"users",appUser.user.uid),{
-            uid:appUser.user.uid,
+          await setDoc(doc(db, "users", appUser.user.uid), {
+            uid: appUser.user.uid,
             displayName,
             email,
-            photoURL:downloadURL
+            photoURL: downloadURL,
           });
-          // await setDoc(doc(db, "userChats",appUser.user.uid),{});
         });
+        setErr(false);
       }
-    );
-
-    }
     catch(err){
+      console.log(err);
       setErr(true);
     }
 
@@ -65,7 +62,7 @@ function Register() {
                 </label>
                 <button type='submit'>Sign up</button>
             </form>
-            <span></span>
+            {err && <span className='err'>Something went wrong!!</span>}
             <p>Already have an account? Login</p>
         </div>
 

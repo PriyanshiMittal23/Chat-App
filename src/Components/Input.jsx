@@ -13,7 +13,7 @@ function Input() {
         <label htmlFor="file">
           <img src={Attach} alt="" />
         </label>
-        {/* <button>Send</button> */}
+        
         <img className='button' src={Send} alt="" />
 
       </div>
