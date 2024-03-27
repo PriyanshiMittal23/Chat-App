@@ -4,10 +4,12 @@ import {auth, storage, db} from '../firebase'
 import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import {ref,uploadBytesResumable,getDownloadURL,uploadBytes,} from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore"; 
+import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
 
   const [err,setErr] = useState(false);
+  const navigate=useNavigate();
 
   const handleSubmit = async(e)=>{
     e.preventDefault();
@@ -36,8 +38,11 @@ function Register() {
             email,
             photoURL: downloadURL,
           });
+          // it is for the user conversation
+          await setDoc(doc(db,'userChats',appUser.user.uid),{})
+          navigate('/');
         });
-        setErr(false);
+        setErr(true);
       }
     catch(err){
       console.log(err);
@@ -63,7 +68,7 @@ function Register() {
                 <button type='submit'>Sign up</button>
             </form>
             {err && <span className='err'>Something went wrong!!</span>}
-            <p>Already have an account? Login</p>
+            <p>Already have an account?<Link to='/login'>Login</Link> </p>
         </div>
 
     </div>

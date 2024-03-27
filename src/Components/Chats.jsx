@@ -1,36 +1,40 @@
-import React from 'react'
+import { onSnapshot,doc } from 'firebase/firestore'
+import React, { useEffect, useState } from 'react'
+import { useContext } from 'react'
+import { AuthContext } from '../Context/authContext'
+import { db } from '../firebase'
 
 function chats() {
+  const [chats,setChats]=useState([])
+
+  const {currUser}=useContext(AuthContext)
+
+  useEffect(()=>{
+    const getChats=()=>{
+    const unsub=onSnapshot(doc(db,'userChats',currUser.uid),(doc)=>{
+      setChats(doc.data());
+    });
+    return ()=>{
+      unsub();
+    }
+  };
+  currUser.uid&&getChats()
+},[currUser.uid]);
+// console.log(Object.entries(chats))
+
   return (
     <div className='chat'>
-      <div className='userChat'>
-        <img src="https://i.pinimg.com/474x/96/64/97/96649787685c2593da073293720974fb.jpg" alt="" />
+      {Object.entries(chats)?.map((chat)=>{
+        <div className='userChat' key={chat[0]}>
+        <img src={chat[1].userInfo.photoURL} alt="" />
         <div className='userChatInfo'>
-          <span>Raghav</span>
-          <p>Hello!</p>
+          <span>{chat[1].userInfo.displayName}</span>
+          <p>{chat[1].userInfo.lastMessage?.text}</p>
         </div>
       </div>
-      <div className='userChat'>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2Z7wKvsnfEwZ7yEVGoNS93CGTz6Ru06wWuY_EQWvqnCuIW3-qJs9ZE6WmI98cFfnaHnU&usqp=CAU" alt="" />
-        <div className='userChatInfo'>
-          <span>Monika</span>
-          <p>Hello!</p>
-        </div>
-      </div>
-      <div className='userChat'>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9Onf3MUUm51sE5OO2jcFUiWxrxkKa7Q3ZP8th6uzpKKf5e_8wNjJwJyMtgeSz0FbfeZE&usqp=CAU" alt="" />
-        <div className='userChatInfo'>
-          <span>Muskan</span>
-          <p>Hello!</p>
-        </div>
-      </div>
-      <div className='userChat'>
-        <img src="https://pbs.twimg.com/media/FO6iZBuX0AUwwhg.jpg" alt="" />
-        <div className='userChatInfo'>
-          <span>Priyanshi</span>
-          <p>Hello!</p>
-        </div>
-      </div>
+      })
+    }
+     
     </div>
   )
 }
